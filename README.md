@@ -1,0 +1,2 @@
+# server
+Fast Notepad Server
