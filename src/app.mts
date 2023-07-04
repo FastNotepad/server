@@ -1,5 +1,7 @@
 /// Main entrance
+import compression from 'compression';
 import express from 'express';
+import helmet from 'helmet';
 
 // Config
 import './modules/config.mjs';
@@ -22,8 +24,11 @@ if (process.argv[2] === 'setup') {
 const app: express.Application = express();
 
 // Use middlewares
+app.use(express.static(__dirname + '/www'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(compression());
+app.use(helmet());
 
 // Use routers
 app.use(authorizeRouter);
