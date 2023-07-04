@@ -70,11 +70,11 @@ router.post('/api/login', (req: express.Request, res: express.Response): void=>{
 	const token: string = jwt.sign({ id: new Date().getTime().toString(16) }, jwtSecret, { algorithm: 'HS256', expiresIn: '1d' });
 
 	// Send token
-	res.json({
-		status: 200,
-		msg: 'Success',
-		token
-	})
+	res.cookie('jwt', token, { maxAge: 86400000 })
+		.json({
+			status: 200,
+			msg: 'Success'
+		});
 });
 
 // Export default
