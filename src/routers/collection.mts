@@ -6,6 +6,46 @@ import { db } from '@/modules/database.mjs';
 // Router
 const router: express.Router = express.Router();
 
+// Get collection
+router.get('/api/collection/:collectionId', authToken, (req: express.Request, res: express.Response): void=>{
+	// Validate
+	if (req.params.collectionId === undefined) {
+		res.sendStatus(400);
+		return;
+	}
+	const collectionId: number = parseInt(req.params.collectionId);
+	if (isNaN(collectionId) || !Number.isInteger(collectionId)) {
+		res.sendStatus(400);
+		return;
+	}
+
+	// Select
+	db('collections')
+		.select('parent_collection_id', 'name')
+		.where('collection_id', collectionId)
+		.then((v: any[]): void=>{
+			if (v.length === 0) {
+				res.json({
+					status: 400,
+					msg: 'Collection not found'
+				});
+			} else {
+				res.json({
+					status: 200,
+					msg: 'Success',
+					data: v[0]
+				});
+			}
+		})
+		.catch((err: Error): void=>{
+			console.error(err);
+			res.json({
+				status: 500,
+				msg: 'Database error'
+			});
+		});
+});
+
 // Create collection
 router.post('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
@@ -56,7 +96,7 @@ router.put('/api/collection', authToken, (req: express.Request, res: express.Res
 	db('collections')
 		.update({
 			name: req.body.name,
-			parent_collection_id: parentId === undefined ? undefined : (parentId === 0 ? null : parentId)
+			parent_collection_id: parentId === 0 ? null : parentId
 		})
 		.where('collection_id', collectionId)
 		.then((): void=>{

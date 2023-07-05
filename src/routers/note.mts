@@ -6,6 +6,46 @@ import { db } from '@/modules/database.mjs';
 // Router
 const router: express.Router = express.Router();
 
+// Get note
+router.get('/api/note/:noteId', authToken, (req: express.Request, res: express.Response): void=>{
+	// Validate
+	if (req.params.noteId === undefined) {
+		res.sendStatus(400);
+		return;
+	}
+	const noteId: number = parseInt(req.params.noteId);
+	if (isNaN(noteId) || !Number.isInteger(noteId)) {
+		res.sendStatus(400);
+		return;
+	}
+
+	// Select
+	db('notes')
+		.select('title', 'modify_at', 'contents')
+		.where('note_id', noteId)
+		.then((v: any[]): void=>{
+			if (v.length === 0) {
+				res.json({
+					status: 400,
+					msg: 'Note not found'
+				});
+			} else {
+				res.json({
+					status: 200,
+					msg: 'Success',
+					data: v[0]
+				});
+			}
+		})
+		.catch((err: Error): void=>{
+			console.error(err);
+			res.json({
+				status: 500,
+				msg: 'Database error'
+			});
+		});
+});
+
 // Create note
 router.post('/api/note', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
