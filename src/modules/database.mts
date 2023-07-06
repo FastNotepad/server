@@ -35,7 +35,7 @@ export async function setup(): Promise<void> {
 		await Promise.all([
 			trx.schema.createTable('collections', (tb: knex.Knex.CreateTableBuilder): void=>{
 				tb.increments('collection_id');
-				tb.integer('parent_collection_id');
+				tb.integer('parent_collection_id').index();
 				tb.string('name').notNullable();
 
 				tb.foreign('parent_collection_id').references('collections.collection_id');

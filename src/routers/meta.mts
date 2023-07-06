@@ -7,10 +7,14 @@ import { db } from '@/modules/database.mjs';
 const router: express.Router = express.Router();
 
 // Get notes by collection
-router.get('/api/meta/notes/:collectionId?', authToken, (req: express.Request, res: express.Response): void=>{
+router.get('/api/meta/notes/:collectionId', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
-	const collectionId: number | undefined = req.body.collectionId === undefined ? undefined : parseInt(req.body.collectionId);
-	if (collectionId !== undefined && (isNaN(collectionId) || !Number.isInteger(collectionId))) {
+	if (req.params.collectionId === undefined) {
+		res.sendStatus(400);
+		return;
+	}
+	const collectionId: number = parseInt(req.params.collectionId);
+	if (isNaN(collectionId) || !Number.isInteger(collectionId)) {
 		res.sendStatus(400);
 		return;
 	}
@@ -18,7 +22,7 @@ router.get('/api/meta/notes/:collectionId?', authToken, (req: express.Request, r
 	// Select
 	db('notes')
 		.select('note_id', 'title')
-		.where('collection_id', collectionId ?? null)
+		.where('collection_id', collectionId === 0 ? null : collectionId)
 		.then((v: any[]): void=>{
 			res.json({
 				status: 200,
@@ -36,10 +40,14 @@ router.get('/api/meta/notes/:collectionId?', authToken, (req: express.Request, r
 });
 
 // Get collections by collection
-router.get('/api/meta/collections/:collectionId?', authToken, (req: express.Request, res: express.Response): void=>{
+router.get('/api/meta/collections/:collectionId', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
-	const collectionId: number | undefined = req.body.collectionId === undefined ? undefined : parseInt(req.body.collectionId);
-	if (collectionId !== undefined && (isNaN(collectionId) || !Number.isInteger(collectionId))) {
+	if (req.params.collectionId === undefined) {
+		res.sendStatus(400);
+		return;
+	}
+	const collectionId: number = parseInt(req.params.collectionId);
+	if (isNaN(collectionId) || !Number.isInteger(collectionId)) {
 		res.sendStatus(400);
 		return;
 	}
@@ -47,7 +55,7 @@ router.get('/api/meta/collections/:collectionId?', authToken, (req: express.Requ
 	// Select
 	db('collections')
 		.select('collection_id', 'name')
-		.where('collection_id', collectionId ?? null)
+		.where('parent_collection_id', collectionId === 0 ? null : collectionId)
 		.then((v: any[]): void=>{
 			res.json({
 				status: 200,

@@ -79,9 +79,9 @@ router.post('/api/note', authToken, (req: express.Request, res: express.Response
 });
 
 // Update note
-router.put('/api/note', authToken, (req: express.Request, res: express.Response): void=>{
+router.patch('/api/note', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
-	if (req.body.noteId === undefined || (req.body.title === undefined && req.body.contents === undefined && req.body.collectionId)) {
+	if (req.body.noteId === undefined || (req.body.title === undefined && req.body.contents === undefined && req.body.collectionId === undefined)) {
 		res.sendStatus(400);
 		return;
 	}
@@ -99,7 +99,7 @@ router.put('/api/note', authToken, (req: express.Request, res: express.Response)
 	// Update
 	db('notes')
 		.update({
-			collection_id: collectionId == undefined ? undefined : (collectionId === 0 ? null : collectionId),
+			collection_id: collectionId === 0 ? null : collectionId,
 			title: req.body.title,
 			contents: req.body.contents,
 			modify_timestamp: db.fn.now()

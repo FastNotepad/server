@@ -75,7 +75,7 @@ router.post('/api/collection', authToken, (req: express.Request, res: express.Re
 });
 
 // Update collection
-router.put('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+router.patch('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
 	// Validate
 	if (req.body.collectionId === undefined || (req.body.name === undefined && req.body.parentId === undefined)) {
 		res.sendStatus(400);
