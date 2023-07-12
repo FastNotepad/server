@@ -1,0 +1,7 @@
+# NodeJS
+dist
+node_modules
+
+# Test
+.env
+*.db
