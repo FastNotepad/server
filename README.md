@@ -6,11 +6,11 @@ Fast Notepad Server
 
 ## Authorization
 
-### \[POST] /api/login
+### \[POST] /api/authorize
 
 #### Description
 
-Login and get JWT.
+Authorize and get JWT.
 
 #### Request body
 
@@ -25,7 +25,8 @@ Login and get JWT.
 ```json
 {
 	"status": 200,
-	"msg": "Success"
+	"msg": "Success",
+	"token": "JWT token"
 }
 ```
 
@@ -38,21 +39,13 @@ Login and get JWT.
 
 ##### 400
 
-Invalid request body
+Invalid request
 
-## Collections
-
-### \[GET] /api/collection/{collectionId}
+### \[PUT] /api/authorize
 
 #### Description
 
-Get collection info by collection ID.
-
-#### Request params
-
-|Name|Description|
-|:---:|:---:|
-|collectionId|Collection ID|
+Refresh JWT.
 
 #### Response
 
@@ -60,32 +53,11 @@ Get collection info by collection ID.
 
 ```json
 {
-	"status": 200,
-	"msg": "Success",
-	"data": {
-		"parent_collection_id": 000,
-		"name": "Collection name"
-	}
+	"token": "JWT token"
 }
 ```
 
-```json
-{
-	"status": 400,
-	"msg": "Collection not found"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
-
-##### 400
-
-Invalid request body
+## Collections
 
 ### \[POST] /api/collection
 
@@ -105,24 +77,47 @@ Create collection.
 
 ```json
 {
-	"status": 200,
-	"msg": "Success",
-	"collectionId": 000
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
+	"id": 000
 }
 ```
 
 ##### 400
 
-Invalid request body
+Invalid request
 
-### \[PATCH] /api/collection
+##### 500
+
+Database error
+
+### \[GET] /api/collection
+
+#### Description
+
+Get all collections.
+
+#### Response
+
+##### 200
+
+```json
+[
+	{
+		"id": 000,
+		"name": "Collection name"
+	},
+	...
+]
+```
+
+##### 400
+
+Invalid request
+
+##### 500
+
+Database error
+
+### \[PUT] /api/collection
 
 #### Description
 
@@ -132,31 +127,22 @@ Update collection.
 
 |Name|Description|
 |:---:|:---:|
-|collectionId|Collection ID|
-|name?|Collection name|
-|parentId?|Parent collection ID, 0 as null|
+|id|Collection ID|
+|name|Collection name|
 
 #### Response
 
-##### 200
+##### 204
 
-```json
-{
-	"status": 200,
-	"msg": "Success"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
+OK
 
 ##### 400
 
-Invalid request body
+Invalid request
+
+##### 500
+
+Database error
 
 ### \[DELETE] /api/collection
 
@@ -164,165 +150,27 @@ Invalid request body
 
 Delete collection.
 
-#### Request body
+#### Request query
 
 |Name|Description|
 |:---:|:---:|
-|collectionId|Collection ID|
+|id|Collection ID|
 
 #### Response
 
-##### 200
+##### 204
 
-```json
-{
-	"status": 200,
-	"msg": "Success"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
+OK
 
 ##### 400
 
-Invalid request body
+Invalid request
 
-## Metas
+##### 500
 
-### \[GET] /api/meta/notes/{collectionId}
-
-#### Description
-
-Get notes by collection ID.
-
-#### Request params
-
-|Name|Description|
-|:---:|:---:|
-|collectionId|Collection ID, 0 as null|
-
-#### Response
-
-##### 200
-
-```json
-{
-	"status": 200,
-	"msg": "Success",
-	"data": [
-		{
-			"note_id": 000,
-			"title": "Note title"
-		},
-		...
-	]
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
-
-##### 400
-
-Invalid request body
-
-### \[GET] /api/meta/notes/{collectionId}
-
-#### Description
-
-Get collections by parent collection ID.
-
-#### Request params
-
-|Name|Description|
-|:---:|:---:|
-|collectionId|Parent collection ID, 0 as null|
-
-#### Response
-
-##### 200
-
-```json
-{
-	"status": 200,
-	"msg": "Success",
-	"data": [
-		{
-			"collection_id": 000,
-			"name": "Collection name"
-		},
-		...
-	]
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
-
-##### 400
-
-Invalid request body
+Database error
 
 ## Notes
-
-### \[GET] /api/note/{noteId}
-
-#### Description
-
-Get note info by note ID.
-
-#### Request params
-
-|Name|Description|
-|:---:|:---:|
-|noteId|Note ID|
-
-#### Response
-
-##### 200
-
-```json
-{
-	"status": 200,
-	"msg": "Success",
-	"data": {
-		"title": "Note title",
-		"modify_at": "Datetime string",
-		"contents": "Markdown contents"
-	}
-}
-```
-
-```json
-{
-	"status": 400,
-	"msg": "Collection not found"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
-
-##### 400
-
-Invalid request body
 
 ### \[POST] /api/note
 
@@ -343,22 +191,71 @@ Create note.
 
 ```json
 {
-	"status": 200,
-	"msg": "Success",
-	"noteId": 000
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
+	"id": 000
 }
 ```
 
 ##### 400
 
-Invalid request body
+Invalid request
+
+##### 500
+
+Database error
+
+### \[GET] /api/note
+
+#### Description
+
+Get note info by note ID/collection/title.
+
+#### Request query
+
+|Name|Description|
+|:---:|:---:|
+|id?|Note ID|
+|collection?|Collection ID, 0 as null|
+|title?|Note title|
+
+#### Response
+
+##### 200
+
+For note ID:
+
+```json
+{
+	"id": 000,
+	"collection": 000,
+	"title": "Note title",
+	"modify_at": "Modify time",
+	"contents": "Note contents"
+}
+```
+
+For others:
+
+```json
+[
+	{
+		"id": 000,
+		"title": "Note title"
+	},
+	...
+]
+```
+
+##### 400
+
+Invalid request
+
+##### 404
+
+Note ID not found
+
+##### 500
+
+Database error
 
 ### \[PATCH] /api/note
 
@@ -370,32 +267,24 @@ Update note.
 
 |Name|Description|
 |:---:|:---:|
-|noteId|Note ID|
+|id|Note ID|
+|collection?|Collection ID, 0 as null|
 |title?|Note title|
 |contents?|Note contents|
-|collectionId?|Note's collection ID, 0 as null|
 
 #### Response
 
-##### 200
+##### 204
 
-```json
-{
-	"status": 200,
-	"msg": "Success"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
+OK
 
 ##### 400
 
-Invalid request body
+Invalid request
+
+##### 500
+
+Database error
 
 ### \[DELETE] /api/note
 
@@ -403,30 +292,22 @@ Invalid request body
 
 Delete note.
 
-#### Request body
+#### Request query
 
 |Name|Description|
 |:---:|:---:|
-|noteId|Note ID|
+|id|Note ID|
 
 #### Response
 
-##### 200
+##### 204
 
-```json
-{
-	"status": 200,
-	"msg": "Success"
-}
-```
-
-```json
-{
-	"status": 500,
-	"msg": "Database error"
-}
-```
+OK
 
 ##### 400
 
-Invalid request body
+Invalid request
+
+##### 500
+
+Database error

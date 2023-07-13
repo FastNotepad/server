@@ -117,7 +117,7 @@ router.patch('/api/note', authToken, (req: express.Request, res: express.Respons
 
   // Call service
   updateNote(req.body.id, {
-    collection: req.body.collection,
+    collection: req.body.collection === 0 ? null : req.body.collection,
     title: req.body.title,
     contents: req.body.contents
   }).then((value: number): void=>{

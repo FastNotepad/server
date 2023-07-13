@@ -81,7 +81,7 @@ router.post('/api/authorize', (req: express.Request, res: express.Response): voi
 });
 
 // Refresh authorize
-router.put('/api/authorize', authToken, (req: express.Request, res: express.Response): void=>{
+router.put('/api/authorize', authToken, (_, res: express.Response): void=>{
   // Logger
   const logger: log4js.Logger = log4js.getLogger('[PUT]/api/authorize');
 

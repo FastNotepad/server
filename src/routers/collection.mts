@@ -33,7 +33,7 @@ router.post('/api/collection', authToken, (req: express.Request, res: express.Re
 });
 
 // Get collections
-router.get('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+router.get('/api/collection', authToken, (_, res: express.Response): void=>{
   // Logger
   const logger: log4js.Logger = log4js.getLogger('[GET]/api/collection');
 
