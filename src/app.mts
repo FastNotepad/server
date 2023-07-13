@@ -2,24 +2,25 @@
 import compression from 'compression';
 import express from 'express';
 import helmet from 'helmet';
+import log4js from 'log4js';
 import path from 'path';
 import url from 'url';
 
 // Config
 import './modules/config.mjs';
+import { setup } from './modules/database.mjs';
 
 // Routers
 import authorizeRouter from './routers/authorize.mjs';
 import collectionRouter from './routers/collection.mjs';
 import noteRouter from './routers/note.mjs';
-import searchRouter from './routers/search.mjs';
+
+// Logger
+const logger: log4js.Logger = log4js.getLogger('app');
 
 // Check argument
-import { setup } from './modules/database.mjs';
 if (process.argv[2] === 'setup') {
-  console.log('Setup database');
   await setup();
-  console.log('Done');
   process.exit(0);
 }
 
@@ -40,9 +41,10 @@ app.use(helmet());
 app.use(authorizeRouter);
 app.use(collectionRouter);
 app.use(noteRouter);
-app.use(searchRouter);
+
+
 
 // Start server
 app.listen(process.env.PORT ?? 3000, (): void=>{
-  console.log(`Server listening on port ${process.env.PORT ?? 3000}`);
+  logger.info(`Server listening on port ${process.env.PORT ?? 3000}`);
 });

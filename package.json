@@ -1,11 +1,11 @@
 {
-  "name": "hydro-blog-server",
-  "version": "1.0.0",
+  "name": "fast-notepad-server",
+  "version": "1.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rollup -c --bundleConfigAsCjs"
+    "build": "rollup -c --bundleConfigAsCjs",
+    "dev": "rollup -c --bundleConfigAsCjs && node dist/app.esm.min.mjs"
   },
   "keywords": [],
   "author": "",
@@ -27,7 +27,8 @@
     "express": "^4.18.2",
     "helmet": "^7.0.0",
     "jsonwebtoken": "^9.0.1",
-    "knex": "^2.5.0",
+    "knex": "^2.5.1",
+    "log4js": "^6.9.1",
     "sqlite3": "^5.1.6"
   }
 }

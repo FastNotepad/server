@@ -1,146 +1,118 @@
 /// Collection router
 import express from 'express';
+import log4js from 'log4js';
 import { authToken } from './authorize.mjs';
-import { db } from '@/modules/database.mjs';
+import { Collection } from '@/modules/database.mjs';
+import { createCollection, deleteCollection, readAllCollections, updateCollection } from '@/modules/service.mjs';
 
 // Router
 const router: express.Router = express.Router();
 
-// Get collection
-router.get('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+// Create collection
+router.post('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+  // Logger
+  const logger: log4js.Logger = log4js.getLogger('[POST]/api/collection');
+
   // Validate
-  if (req.query.id === undefined) {
-    res.sendStatus(400);
-    return;
-  }
-  const id: number = parseInt(req.query.id.toString());
-  if (isNaN(id) || !Number.isInteger(id)) {
+  if (typeof req.body.name !== 'string') {
+    logger.warn('Invalid request body:', req.body);
     res.sendStatus(400);
     return;
   }
 
-  // Select
-  db('collections')
-    .select('name', 'locked')
-    .where('id', id)
-    .then((v: any[]): void=>{
-      if (v.length === 0) {
-        res.json({
-          status: 400,
-          msg: 'Collection not found'
-        });
-      } else {
-        res.json({
-          status: 200,
-          msg: 'Success',
-          data: v[0]
-        });
-      }
+  // Call service
+  createCollection(req.body.name)
+    .then((value: Pick<Collection, 'id'>): void=>{
+      logger.debug(`Created: id=${value.id}`);
+      res.json(value);
     })
     .catch((err: Error): void=>{
-      console.error(err);
-      res.json({
-        status: 500,
-        msg: 'Database error'
-      });
+      logger.error('Fail to create:', err);
+      res.status(500).send('Database error');
     });
 });
 
-// Create collection
-router.post('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
-  // Validate
-  if (typeof req.body.name !== 'string') {
-    res.sendStatus(400);
-    return;
-  }
+// Get collections
+router.get('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+  // Logger
+  const logger: log4js.Logger = log4js.getLogger('[GET]/api/collection');
 
-  // Insert
-  db('collections')
-    .insert({ name: req.body.name })
-    .returning('id')
-    .then((v: { id: number }[]): void=>{
-      res.json({
-        status: 200,
-        msg: 'Success',
-        id: v[0].id
-      })
+  // Call service
+  readAllCollections()
+    .then((value: Collection[]): void=>{
+      logger.debug('Got');
+      res.json(value);
     })
     .catch((err: Error): void=>{
-      console.error(err);
-      res.json({
-        status: 500,
-        msg: 'Database error'
-      });
+      logger.error('Fail to get:', err);
+      res.status(500).send('Database error');
     });
 });
 
 // Update collection
-router.patch('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+router.put('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+  // Logger
+  const logger: log4js.Logger = log4js.getLogger('[PUT]/api/collection');
+
   // Validate
   if (typeof req.body.id !== 'number' || !Number.isInteger(req.body.id)) {
+    logger.warn('Invalid request body:', req.body);
     res.sendStatus(400);
     return;
   }
-  if (!['string', 'undefined'].includes(typeof req.body.name)) {
-    res.sendStatus(400);
-    return;
-  }
-  if (!['boolean', 'undefined'].includes(typeof req.body.locked)) {
+  if (typeof req.body.name !== 'string') {
+    logger.warn('Invalid request body:', req.body);
     res.sendStatus(400);
     return;
   }
 
-  // Update
-  db('collections')
-    .update({
-      name: req.body.name,
-      locked: req.body.locked
-    })
-    .where('id', req.body.id)
-    .then((): void=>{
-      res.json({
-        status: 200,
-        msg: 'Success'
-      });
+  // Call service
+  updateCollection(req.body.id, req.body.name)
+    .then((value: number): void=>{
+      if (value === 0) {
+        logger.warn(`Not updated: id=${req.body.id}, name=${req.body.name}`);
+      } else {
+        logger.debug(`Updated: id=${req.body.id}, name=${req.body.name}`);
+      }
+      res.sendStatus(204);
     })
     .catch((err: Error): void=>{
-      console.error(err);
-      res.json({
-        status: 500,
-        msg: 'Database error'
-      });
+      logger.error('Fail to update:', err);
+      res.status(500).send('Database error');
     });
 });
 
 // Delete collection
 router.delete('/api/collection', authToken, (req: express.Request, res: express.Response): void=>{
+  // Logger
+  const logger: log4js.Logger = log4js.getLogger('[DELETE]/api/collection');
+
   // Validate
   if (req.query.id === undefined) {
+    logger.warn('Invalid request query:', req.query);
     res.sendStatus(400);
     return;
   }
   const id: number = parseInt(req.query.id.toString());
   if (isNaN(id) || !Number.isInteger(id)) {
+    logger.warn('Invalid request query:', req.query);
     res.sendStatus(400);
     return;
   }
 
-  // Delete
-  db('collections')
-    .delete()
-    .where('id', id)
-    .then((): void=>{
-      res.json({
-        status: 200,
-        msg: 'Success'
-      });
+  // Call service
+  deleteCollection(id)
+    .then((value: number): void=>{
+      if (value === 0) {
+        logger.warn(`Not deleted: id=${id}`);
+      } else {
+        logger.debug(`Deleted: id=${id}`);
+      }
+      res.sendStatus(204);
     })
     .catch((err: Error): void=>{
-      console.error(err);
-      res.json({
-        status: 500,
-        msg: 'Database error'
-      });
+      logger.error('Fail to update:', err);
+      res.status(500).send('Database error');
     });
 });
 
